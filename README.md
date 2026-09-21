@@ -28,9 +28,5 @@ Each directory/folder is a separate Celbridge project
 
 - Part 1 - Set up a TS project, run main and typecheck a function call
     - the README for this part
-    - 
+    - https://github.com/dr-matt-smith/TS101/blob/main/CB-ts101-part01/README.md
 
-
-
-
-- 
