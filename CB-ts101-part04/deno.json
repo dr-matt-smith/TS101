@@ -1,0 +1,13 @@
+{
+  "tasks": {
+    "build": "deno run --allow-read --allow-write --allow-net --allow-env --allow-run build.ts",
+    "dev": "deno run --watch=src,public --allow-read --allow-write --allow-net --allow-env --allow-run build.ts",
+    "check": "deno check src/main.ts"
+  },
+  "imports": {
+    "@deno/emit": "jsr:@deno/emit@^0.46.0"
+  },
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"]
+  }
+}

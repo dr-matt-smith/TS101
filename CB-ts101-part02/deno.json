@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "build": "deno bundle --platform browser src/main.ts -o public/game.js",
+    "check": "deno check src/main.ts"
+  }
+}

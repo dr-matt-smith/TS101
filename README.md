@@ -30,3 +30,4 @@ Each directory/folder is a separate Celbridge project
     - the README for this part
     - https://github.com/dr-matt-smith/TS101/blob/main/CB-ts101-part01/README.md
 
+- Part 02 - build an HTML/CSS/JS site from TS source

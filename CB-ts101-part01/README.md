@@ -1,4 +1,4 @@
-# TypeScript 101
+# TypeScript 101 - part 01 - Set up a TS project, run main and typecheck a function call
 
 ## Exercise 1-1: Install deno
 
@@ -27,7 +27,7 @@ Do the following:
 1. create a new project
    - e.g. create a new empty Celbridge project
 
-![Celbridge new project](images/1_new_project.webp)
+![Celbridge new project](README_images/1_new_project.webp)
 
 1. create (and open) a Celbridge console document
    <br>
@@ -36,9 +36,9 @@ Do the following:
   - e.g I usually create a simple console document named `shell.console`
     - no settings need to be changed for the default console document
 
-![Celbridge new console document](images/2_new_console_document.webp)
+![Celbridge new console document](README_images/2_new_console_document.webp)
 
-![Celbridge open console document](images/3_open_console_document.webp)
+![Celbridge open console document](README_images/3_open_console_document.webp)
 
 
 2. test **deno** at the command line
@@ -75,7 +75,7 @@ typescript 6.0.3
 console.log('Hello, World.');
 ```
 
-![Celbridge main.ts TypeScript document](images/4_main_ts.webp)
+![Celbridge main.ts TypeScript document](README_images/4_main_ts.webp)
 
 
 
@@ -91,7 +91,7 @@ $ deno run main.ts
 Hello, World.
 ```
 
-![Celbridge run main.ts in console](images/6_run_main_ts.webp)
+![Celbridge run main.ts in console](README_images/6_run_main_ts.webp)
 
 ## Exercise 1-4: Test type checking with a function
 
@@ -104,7 +104,7 @@ export function sayHello(name: string): string {
 }
 ```
 
-![Celbridge my_functions.ts TypeScript document](images/7_my_functions.webp)
+![Celbridge my_functions.ts TypeScript document](README_images/7_my_functions.webp)
 
 2. Edit `main.ts` to call the function with a string, then a number:
 
@@ -121,7 +121,7 @@ output = sayHello(name2);
 console.log(output);
 ```
 
-![Celbridge updated main.ts](images/8_main_ts_updated.webp)
+![Celbridge updated main.ts](README_images/8_main_ts_updated.webp)
 
 3. get **deno** to check the scripts:
 
@@ -141,7 +141,28 @@ output = sayHello(name2);
 error: Type checking failed.
 ```
 
-![Celbridge checking main.ts](images/9_deno_check_types.webp)
+![Celbridge checking main.ts](README_images/9_deno_check_types.webp)
 
 NOTE:
 - the error occurs at line 8, since this is when `main.ts` is passing a number (`33` inside `name2` to the function expecting a string)
+
+
+
+## Exercise 1-5: Comment out bad code and see it work
+
+If we comment out the code calling the function the second time, then it should all work fine:
+
+```ts
+import {sayHello} from './my_functions.ts';
+
+const name1 = 'matt';
+let output = sayHello(name1);
+console.log(output);
+
+// const name2 = 33;
+// output = sayHello(name2);
+// console.log(output);
+```
+
+
+![Celbridge console output all working fine](README_images/10_working_function.webp)

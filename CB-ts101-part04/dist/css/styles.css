@@ -1,0 +1,91 @@
+:root {
+  --primary: #66c2ff;
+  --primary-dark: #0077cc;
+  --secondary: #cbd1e1;
+  --tertiary: #e5e9f2;
+  --bg: #f1f3f9;
+  --dark: #1e253b;
+}
+
+html {
+  box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0 auto;
+  padding: 1rem;
+  background-color: var(--bg);
+  color: var(--dark);
+  line-height: 1.6;
+  font-family: system-ui, sans-serif;
+}
+
+main {
+  max-width: calc(800px + 2rem + 4px);
+  margin: 0 auto;
+}
+
+h1 {
+  margin: 1.5rem auto;
+  color: var(--dark);
+  text-align: center;
+}
+
+h2,
+h3 {
+  margin: 1rem 0;
+  color: var(--dark);
+  text-align: center;
+}
+
+.container {
+  margin: 0 auto 1.5rem;
+  padding: 1rem;
+  border: 2px solid var(--secondary);
+  border-radius: 1px;
+  background: white;
+  box-shadow: 2px 4px 0px 0px var(--tertiary);
+  text-align: center;
+}
+
+/* Game canvas - 800 x 600, shrinks to fit narrow windows (the game still uses 800 x 600 pixels) */
+
+#gameCanvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  background: var(--dark);
+}
+
+.control-grid {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  justify-items: start;
+  gap: 0.5rem 1rem;
+  grid-template-columns: max-content max-content;
+  margin: 1rem auto;
+}
+
+kbd {
+  justify-self: end;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: max-content;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 0;
+  }
+}
