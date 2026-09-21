@@ -24,10 +24,41 @@ I'll be providing screenshots using the following technologies, but you can, of 
 Each directory/folder is a separate Celbridge project
 - so download the whole repo, and click the `.celbridge` file to open each project in Celbridge
 
-## The course
+## DO THESE STEPS:
 
-- Part 1 - Set up a TS project, run main and typecheck a function call
-    - the README for this part
-    - https://github.com/dr-matt-smith/TS101/blob/main/CB-ts101-part01/README.md
+1. download / clone this repo to. your computer
 
-- Part 02 - build an HTML/CSS/JS site from TS source
+3. install Celbridge and deno (or your preferrfed editor / TS transpiler...)
+
+  - https://www.celbridge.org/download/
+  - https://deno.com/
+
+4. look at the READMEs in the part01/02/03/04
+
+   - they are a step-by-step introduction to TypeScript for HTML page games ...
+
+
+## Lots of TypeScript learning resources
+
+
+- The TypeScript Handbook
+    - https://www.typescriptlang.org/docs/handbook/intro.html
+
+- Totally TypeScript: Total TypeScript Essentials
+    - https://www.totaltypescript.com/books/total-typescript-essentials
+
+- TypeScript Deep Dive
+    - https://basarat.gitbook.io/typescript/overview
+
+- TypeScript docs
+    - https://www.typescriptlang.org/docs/
+
+- Lambda expressions / anonymous functions / arrow functions
+    - typescriptlang
+        - https://www.typescriptlang.org/docs/handbook/2/functions.html
+    - XJavascript
+        - https://www.baeldung.com/java-oop
+    - GeeksforGeeks
+        - https://www.geeksforgeeks.org/typescript/explain-the-arrow-function-syntax-in-typescript/
+    - W3Schools - (JavaScript)
+        - https://www.w3schools.com/Js/js_arrow_function.asp
