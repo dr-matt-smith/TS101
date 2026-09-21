@@ -1,4 +1,4 @@
-# TypeScript 101 - part 02 - build an HTML/CSS/JS site from TS source
+# TypeScript 101 - part 03 - build tooling, to combine all TS scripts into a single JS
 
 Rather than working directly in `/public`, and rather than individually transpiling each TS file into a JS file, a typical project setup for a TS-driven website game is as follows:
 - final site output in `/dist`

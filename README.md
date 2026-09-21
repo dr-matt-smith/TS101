@@ -28,7 +28,7 @@ Each directory/folder is a separate Celbridge project
 
 1. download / clone this repo to. your computer
 
-3. install Celbridge and deno (or your preferrfed editor / TS transpiler...)
+3. install Celbridge and deno (or your preferred editor / TS transpiler...)
 
   - https://www.celbridge.org/download/
   - https://deno.com/
@@ -36,6 +36,15 @@ Each directory/folder is a separate Celbridge project
 4. look at the READMEs in the part01/02/03/04
 
    - they are a step-by-step introduction to TypeScript for HTML page games ...
+
+  - part 1: Set up a TS project, run main and typecheck a function call
+    - [B-ts101-part01/README.md](./CB-ts101-part01/README.md)
+  - part 2: build an HTML/CSS/JS site from TS source
+    - [B-ts101-part02/README.md](./CB-ts101-part02/README.md)
+  - part 3: build tooling, to combine all TS scripts into a single JS
+    - [B-ts101-part02/README.md](./CB-ts101-part02/README.md)
+  - part 4: adding CSS and a second TS file
+    - [B-ts101-part02/README.md](./CB-ts101-part02/README.md)
 
 
 ## Lots of TypeScript learning resources
