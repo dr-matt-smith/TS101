@@ -1,5 +1,10 @@
 # TypeScript 101 - part 01 - Set up a TS project, run main and typecheck a function call
 
+> This README uses **Deno**. No Deno on your computer (e.g. the college lab PCs)?
+> Use [README_node.md](README_node.md) instead - it's the same exercises, with Node commands.
+>
+> See [README_deno_TS_workflow.md](README_deno_TS_workflow.md) for a summary of the Deno commands.
+
 ## Exercise 1-1: Install deno
 
 Do the following:
@@ -12,11 +17,8 @@ https://deno.com/
 NOTE:
 - I'm assuming you are using **deno** for your TypeScript projects
 
-- you could also be using Node & tsc. in which case refer to the documentation for them, e.g.
-  - the tsc (TypeScript compiler)
-    - https://betterstack.com/community/guides/scaling-nodejs/cli-tsc-compiler/
-  - Node TS runner
-    - https://nodejs.org/learn/typescript/run
+- you could also be using **Node** (v26 or later) - in which case follow [README_node.md](README_node.md) instead,
+  which is the same exercises, with Node commands
 
 ## Exercise 1-2: test your deno setup
 

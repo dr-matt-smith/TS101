@@ -1,6 +1,11 @@
 {
   "tasks": {
     "build": "deno bundle --platform browser src/main.ts -o public/game.js",
-    "check": "deno check src/main.ts"
+    "check": "deno check src/main.ts",
+    "serve": "deno run --allow-read --allow-write --allow-env --allow-run --allow-net npm:esbuild --servedir=public --serve=127.0.0.1:8000"
+  },
+  "nodeModulesDir": "auto",
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"]
   }
 }

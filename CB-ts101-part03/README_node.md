@@ -16,10 +16,10 @@ So we can upload/ZIP and share the contents of the `/dist` folder
 ![Celbridge our build process](README_images/6_build_ts.webp)
 
 
-> This README uses **Deno**. No Deno on your computer (e.g. the college lab PCs)?
-> Use [README_node.md](README_node.md) instead - it's the same exercises, with Node commands.
+> This README uses **Node** (v26 or later), e.g. on the college lab PCs. If you have Deno installed,
+> [README.md](README.md) is the main version of these exercises, with Deno commands.
 >
-> See [README_deno_TS_workflow.md](README_deno_TS_workflow.md) for all the Deno build and serve commands.
+> See [README_node_TS_workflow.md](README_node_TS_workflow.md) for all the Node build and serve commands.
 
 ## Exercise 3-1: Make a copy of the previous project
 
@@ -41,12 +41,12 @@ We don't want to keep 'stale' JS files around
 When we have edited TypeScript files, we want to then transpile (translate) them into JavaScript, and combine them all into a single file `/game.js`
 
 This `build.ts` will do this for us
-- since we have Deno, we can write useful scripts in TypeScript, since Deno can run TypeScript files directly
+- Node (v26 or later) can run TypeScript files directly, so we can write useful scripts in TypeScript
 - the same `build.ts` works with both Deno and Node - it uses the **esbuild** tool to do the bundling
 
 This script will transpile all the TS script in `/src` into a single JS file as `/dist/game.js`.
-- to run once we'd run at the terminal `deno task build`
-- to watch TS files for changes, and then automatically rebuild `/dist/game.js` we'd run at the terminal `deno task dev`
+- to run once we'd run at the terminal `npm run build`
+- to watch TS files for changes, and then automatically rebuild `/dist/game.js` we'd run at the terminal `npm run dev`
 
 ```ts
 // Builds src/ (TypeScript) and public/ (static assets) -> dist/
@@ -109,63 +109,86 @@ copyFolder("public", "dist");
 
 ![Celbridge build.ts document](README_images/3_build_ts.webp)
 
-## Exercise 3-3: Declare shortcuts and dependencies in `deno.json`
+## Exercise 3-3: Declare shortcuts and dependencies in `package.json`
 
-Our build script needs a shortcut, and a dependent library (esbuild), which we can declare in our `deno.json` file.
+Our build script needs some shortcuts, and some dependent tools, which we declare in a `package.json` file.
+We also need a `tsconfig.json` file, to configure the TypeScript type checker.
 
-1. So replace the contents of `deno.json` with the following:
+1. Create (or replace the contents of) `package.json` with the following:
 
 ```json
 {
-  "tasks": {
-    "build": "deno run --allow-read --allow-write --allow-env --allow-run build.ts",
-    "dev": "deno run --watch=src,public --allow-read --allow-write --allow-env --allow-run build.ts",
-    "check": "deno check src/main.ts",
-    "serve": "deno run --allow-read --allow-write --allow-env --allow-run --allow-net npm:esbuild --servedir=dist --serve=127.0.0.1:8000"
+  "name": "ts101-part03",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.ts",
+    "dev": "node --watch-path=src --watch-path=public build.ts",
+    "check": "tsc --noEmit",
+    "serve": "esbuild --servedir=dist --serve=127.0.0.1:8000"
   },
-  "imports": {
-    "esbuild": "npm:esbuild@^0.25.0"
-  },
-  "nodeModulesDir": "auto",
-  "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"]
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "typescript": "^5.9.0"
   }
 }
 ```
 
-We have now declared 4 shortcuts:
-- `deno task build`
-  - this will take all TS files in `/src` and combine them into a single JS file `/dist/game.js`
-- `deno task dev`
-  - this automates the previous action - so deno WATCHES for file changes in `/src` and `/public`, and when a file is updated, it automatically re-builds `/dist`
-- `deno task check`
-  - this allows us to run a static type check on our TS files, to help avoid run-time errors ...
-- `deno task serve`
-  - this runs a local web server, so you can view `/dist` at http://127.0.0.1:8000/ (press Ctrl+C to stop it)
+2. Create file `tsconfig.json` with the following:
 
-And some settings:
-- `imports` tells Deno where to download `esbuild` from (the npm package library)
-- `"nodeModulesDir": "auto"` lets Deno download npm packages like esbuild automatically, the first time they are needed
-- `compilerOptions` tells the type checker our code runs in a web page (so it knows about `document`, `HTMLCanvasElement`, ...)
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "strict": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}
+```
+
+3. Install the tools listed in `package.json` (esbuild and TypeScript) into a `node_modules/` folder:
+
+```bash
+npm install
+```
+
+You only need to do this **once per project** (it needs an internet connection).
+
+We have now declared 4 shortcuts (in the `"scripts"` section of `package.json`):
+- `npm run build`
+  - this will take all TS files in `/src` and combine them into a single JS file `/dist/game.js`
+- `npm run dev`
+  - this automates the previous action - so Node WATCHES for file changes in `/src` and `/public`, and when a file is updated, it automatically re-builds `/dist`
+- `npm run check`
+  - this allows us to run a static type check on our TS files, to help avoid run-time errors ...
+- `npm run serve`
+  - this runs a local web server, so you can view `/dist` at http://127.0.0.1:8000/ (press Ctrl+C to stop it)
 
 ## Exercise 3-4: Build the `dist` folder from source
 
 Run the build by typing in the console line:
 
 ```bash
-deno task build
+npm run build
 ```
 
 TERMINAL DUMP:
 ```bash
-$ deno task build
-Task build deno run --allow-read --allow-write --allow-env --allow-run build.ts
-Check src/main.ts
+$ npm run build
+
+> ts101-part03@1.0.0 build
+> node build.ts
+
 Built dist/game.js from src/main.ts (and the files it imports)
 Copied dist/index.html from public/index.html
 ```
-
-(The very first time, you'll also see some `Initialize esbuild...` lines, as Deno downloads esbuild.)
 
 You now have a `dist` folder containing your HTML game!
 - but you may not be able to see it yet, due to a default setting in Celbridge

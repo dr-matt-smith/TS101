@@ -1,0 +1,16 @@
+{
+  "name": "ts101-part04",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.ts",
+    "dev": "node --watch-path=src --watch-path=public build.ts",
+    "check": "tsc --noEmit",
+    "serve": "esbuild --servedir=dist --serve=127.0.0.1:8000"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "typescript": "^5.9.0"
+  }
+}

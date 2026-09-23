@@ -2,58 +2,55 @@
 //   - src/main.ts + everything it imports -> dist/game.js   (bundled into ONE plain script)
 //   - public/**/*                         -> dist/**/*      (HTML, CSS, images, ... copied as-is)
 //
-// Run once:               deno task build
-// Watch & rebuild on save: deno task dev
-import { bundle } from "@deno/emit";
+// Works with both Node and Deno:
+//   Run once:                npm run build   OR   deno task build
+//   Watch & rebuild on save: npm run dev     OR   deno task dev
+import { spawnSync } from "node:child_process";
+import { copyFileSync, mkdirSync, readdirSync, rmSync } from "node:fs";
+import { createRequire } from "node:module";
+import process from "node:process";
+import * as esbuild from "esbuild";
 
-const ROOT_DIR = new URL("./", import.meta.url);
-const SRC_DIR = new URL("./src/", ROOT_DIR);
-const PUBLIC_DIR = new URL("./public/", ROOT_DIR);
-const DIST_DIR = new URL("./dist/", ROOT_DIR);
+const isDeno = "Deno" in globalThis;
 
 // start with an empty dist/ folder, so no old files are left behind
-await Deno.remove(DIST_DIR, { recursive: true }).catch(() => {});
-await Deno.mkdir(DIST_DIR, { recursive: true });
-
-// Recursively visits every file under `dir`, calling `onFile` with a path relative to `dir`.
-async function walk(
-  dir: URL,
-  onFile: (relativePath: string) => Promise<void>,
-  prefix = "",
-) {
-  for await (const entry of Deno.readDir(dir)) {
-    const relativePath = prefix + entry.name;
-    if (entry.isDirectory) {
-      await walk(new URL(entry.name + "/", dir), onFile, relativePath + "/");
-    } else {
-      await onFile(relativePath);
-    }
-  }
-}
+rmSync("dist", { recursive: true, force: true });
+mkdirSync("dist", { recursive: true });
 
 // 1. Type check the TypeScript (bundling only strips the types, it doesn't check them).
 //    Errors are reported, but the game is still built so you can keep experimenting.
-const check = await new Deno.Command(Deno.execPath(), {
-  args: ["check", "src/main.ts"],
-  cwd: ROOT_DIR,
-  stdout: "inherit",
-  stderr: "inherit",
-}).output();
-if (!check.success) {
+//    Deno has a type checker built in; Node uses the TypeScript compiler from node_modules.
+const checkArgs = isDeno
+  ? ["check", "src/main.ts"]
+  : [createRequire(import.meta.url).resolve("typescript/bin/tsc"), "--noEmit"];
+const check = spawnSync(process.execPath, checkArgs, { stdio: "inherit" });
+if (check.status !== 0) {
   console.log("TypeScript found errors (see above) - the game was still built, but may not work");
 }
 
 // 2. Bundle src/main.ts and every file it imports into dist/game.js.
-const result = await bundle(new URL("main.ts", SRC_DIR), { type: "classic" });
-await Deno.writeTextFile(new URL("game.js", DIST_DIR), result.code);
+await esbuild.build({
+  entryPoints: ["src/main.ts"],
+  bundle: true,
+  format: "iife", // a plain <script>, not a module
+  outfile: "dist/game.js",
+  logLevel: "warning",
+});
+await esbuild.stop(); // Deno waits for esbuild's helper process, so shut it down
 console.log("Built dist/game.js from src/main.ts (and the files it imports)");
 
 // 3. Copy every file under public/ (HTML, CSS, images, ...) as-is.
-await walk(PUBLIC_DIR, async (relativePath) => {
-  const fileSrc = new URL(relativePath, PUBLIC_DIR);
-  const fileOut = new URL(relativePath, DIST_DIR);
-
-  await Deno.mkdir(new URL(".", fileOut), { recursive: true });
-  await Deno.copyFile(fileSrc, fileOut);
-  console.log(`Copied dist/${relativePath} from public/${relativePath}`);
-});
+function copyFolder(from: string, to: string) {
+  mkdirSync(to, { recursive: true });
+  for (const entry of readdirSync(from, { withFileTypes: true })) {
+    const fileSrc = `${from}/${entry.name}`;
+    const fileOut = `${to}/${entry.name}`;
+    if (entry.isDirectory()) {
+      copyFolder(fileSrc, fileOut);
+    } else if (entry.name !== ".DS_Store" && !entry.name.endsWith(".cel")) {
+      copyFileSync(fileSrc, fileOut);
+      console.log(`Copied ${fileOut} from ${fileSrc}`);
+    }
+  }
+}
+copyFolder("public", "dist");

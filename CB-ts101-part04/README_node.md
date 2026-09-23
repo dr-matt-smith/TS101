@@ -7,10 +7,10 @@ Let's now test our build process with:
   - which should get transpiled with `main.ts` into the `/dist/game.js`
 
 
-> This README uses **Deno**. No Deno on your computer (e.g. the college lab PCs)?
-> Use [README_node.md](README_node.md) instead - it's the same exercises, with Node commands.
+> This README uses **Node** (v26 or later), e.g. on the college lab PCs. If you have Deno installed,
+> [README.md](README.md) is the main version of these exercises, with Deno commands.
 >
-> See [README_deno_TS_workflow.md](README_deno_TS_workflow.md) for all the Deno build and serve commands.
+> See [README_node_TS_workflow.md](README_node_TS_workflow.md) for all the Node build and serve commands.
 
 ## Exercise 4-1: Create CSS file `styles.css` in `/public/css`
 
@@ -184,17 +184,25 @@ const BACKGROUND_COLOUR = RED;
 
 ## Exercise 4-5: Build the distribution
 
-Run the build by typing in the console line:
+The first time you use the project, install the build tools (TypeScript and esbuild) into `node_modules/`:
 
 ```bash
-deno task build
+npm install
+```
+
+Then run the build by typing in the console line:
+
+```bash
+npm run build
 ```
 
 TERMINAL DUMP:
 ```bash
-$ deno task build
-Task build deno run --allow-read --allow-write --allow-env --allow-run build.ts
-Check src/main.ts
+$ npm run build
+
+> ts101-part04@1.0.0 build
+> node build.ts
+
 Built dist/game.js from src/main.ts (and the files it imports)
 Copied dist/css/styles.css from public/css/styles.css
 Copied dist/index.html from public/index.html
@@ -205,8 +213,8 @@ We see the following:
 - `dist/index.html` copied from `public/index.html`
 - `dist/css/styles.css` copied from `public/css/styles.css`
 
-To see the game served as a real web page, run `deno task serve` and open http://127.0.0.1:8000/
-(press Ctrl+C to stop the server). See [README_deno_TS_workflow.md](README_deno_TS_workflow.md) for details.
+To see the game served as a real web page, run `npm run serve` and open http://127.0.0.1:8000/
+(press Ctrl+C to stop the server). See [README_node_TS_workflow.md](README_node_TS_workflow.md) for details.
 
 ![Celbridge run the build at the CLI](README_images/5_run_build_ts.webp)
 

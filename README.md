@@ -20,6 +20,9 @@ I'll be providing screenshots using the following technologies, but you can, of 
 - deno
   - from the author who created Node, deno is  free, open-source TS compiler where TS is the first-class citizen
   - https://deno.com/
+- Node (v26 or later) - as an alternative to deno
+  - e.g. on college lab PCs where deno isn't installed
+  - every project works with both: `README.md` uses deno, and `README_node.md` is the same exercises using Node
 
 Each directory/folder is a separate Celbridge project
 - so download the whole repo, and click the `.celbridge` file to open each project in Celbridge
@@ -28,7 +31,7 @@ Each directory/folder is a separate Celbridge project
 
 1. download / clone this repo to. your computer
 
-3. install Celbridge and deno (or your preferred editor / TS transpiler...)
+3. install Celbridge and deno (or Node v26+, or your preferred editor / TS transpiler...)
 
   - https://www.celbridge.org/download/
   - https://deno.com/
@@ -38,13 +41,15 @@ Each directory/folder is a separate Celbridge project
    - they are a step-by-step introduction to TypeScript for HTML page games ...
 
   - part 1: Set up a TS project, run main and typecheck a function call
-    - [B-ts101-part01/README.md](./CB-ts101-part01/README.md)
+    - [CB-ts101-part01/README.md](./CB-ts101-part01/README.md) (Node: [README_node.md](./CB-ts101-part01/README_node.md))
   - part 2: build an HTML/CSS/JS site from TS source
-    - [B-ts101-part02/README.md](./CB-ts101-part02/README.md)
+    - [CB-ts101-part02/README.md](./CB-ts101-part02/README.md) (Node: [README_node.md](./CB-ts101-part02/README_node.md))
   - part 3: build tooling, to combine all TS scripts into a single JS
-    - [B-ts101-part02/README.md](./CB-ts101-part02/README.md)
+    - [CB-ts101-part03/README.md](./CB-ts101-part03/README.md) (Node: [README_node.md](./CB-ts101-part03/README_node.md))
   - part 4: adding CSS and a second TS file
-    - [B-ts101-part02/README.md](./CB-ts101-part02/README.md)
+    - [CB-ts101-part04/README.md](./CB-ts101-part04/README.md) (Node: [README_node.md](./CB-ts101-part04/README_node.md))
+
+   Each project also has a quick reference of its commands: `README_deno_TS_workflow.md` and `README_node_TS_workflow.md`
 
 
 ## Lots of TypeScript learning resources

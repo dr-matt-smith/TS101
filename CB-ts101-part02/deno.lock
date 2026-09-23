@@ -1,7 +1,6 @@
 {
   "version": "5",
   "specifiers": {
-    "npm:esbuild@*": "0.25.12",
     "npm:esbuild@0.25": "0.25.12",
     "npm:typescript@^5.9.0": "5.9.3"
   },
@@ -175,9 +174,6 @@
     }
   },
   "workspace": {
-    "dependencies": [
-      "npm:esbuild@0.25"
-    ],
     "packageJson": {
       "dependencies": [
         "npm:esbuild@0.25",

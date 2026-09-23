@@ -8,10 +8,10 @@ A simple TS-driven website can be as simple as follows:
 
 
 
-> This README uses **Deno**. No Deno on your computer (e.g. the college lab PCs)?
-> Use [README_node.md](README_node.md) instead - it's the same exercises, with Node commands.
+> This README uses **Node** (v26 or later), e.g. on the college lab PCs. If you have Deno installed,
+> [README.md](README.md) is the main version of these exercises, with Deno commands.
 >
-> See [README_deno_TS_workflow.md](README_deno_TS_workflow.md) for all the Deno build and serve commands.
+> See [README_node_TS_workflow.md](README_node_TS_workflow.md) for all the Node build and serve commands.
 
 ## Exercise 2-1: Create HTML page in `/public`
 
@@ -91,25 +91,69 @@ NOTE:
 
 ## Exercise 2-3: Create our JS from our TS script
 
+Node can run TypeScript, but to turn our TS into a JavaScript file for a web page we need a **bundler** tool.
+We'll use **esbuild** (and TypeScript itself, for type checking later). These tools are listed in a `package.json` file.
 
-1. get deno to transpile `/src/main.ts` -> `/public/game.js`
+1. Create file `package.json` (in the project root) containing the following:
+
+```json
+{
+  "name": "ts101-part02",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "typescript": "^5.9.0"
+  }
+}
+```
+
+2. Create file `tsconfig.json` (in the project root) containing the following - this configures the TypeScript type checker:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "strict": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}
+```
+
+3. Install the tools listed in `package.json` into a `node_modules/` folder:
+
+```bash
+npm install
+```
+
+You only need to do this **once per project** (it needs an internet connection).
+
+4. get esbuild to transpile `/src/main.ts` -> `/public/game.js`
 
 At the terminal, run:
 
 ```bash
-deno bundle --platform browser --watch src/main.ts -o public/game.js
+npx esbuild src/main.ts --bundle --outfile=public/game.js
 ```
 
 TERMINAL DUMP:
 ```bash
-$ deno bundle --platform browser src/main.ts -o public/game.js
-⚠️  deno bundle is experimental and subject to changes
-Bundled 1 module in 2ms
-  public/game.js 406B
+$ npx esbuild src/main.ts --bundle --outfile=public/game.js
 
-CB-ts101-part02 % 
+  public/game.js  447b
+
+⚡ Done in 2ms
 ```
 
+NOTE:
+- `npx` runs a tool installed in `node_modules/`
 
 ## Exercise 2-4: View the HTML file
 
@@ -141,22 +185,21 @@ You should now see the web page, with text Apple Move, and blue rectangle
      
     ...
     ```
-1. get deno to transpile the updated `/src/main.ts` -> `/public/game.js`
+1. get esbuild to transpile the updated `/src/main.ts` -> `/public/game.js`
 
     At the terminal, run:
     
     ```bash
-    deno bundle --platform browser --watch src/main.ts -o public/game.js
+    npx esbuild src/main.ts --bundle --outfile=public/game.js
     ```
-    
+
     TERMINAL DUMP:
     ```bash
-    $ deno bundle --platform browser src/main.ts -o public/game.js
-    ⚠️  deno bundle is experimental and subject to changes
-    Bundled 1 module in 2ms
-      public/game.js 406B
+    $ npx esbuild src/main.ts --bundle --outfile=public/game.js
     
-    CB-ts101-part02 % 
+      public/game.js  447b
+    
+    ⚡ Done in 2ms
     ```
 
 1. refresh the HTML page view, to see the new JS code executed:
@@ -168,29 +211,33 @@ You should now see the web page, with text Apple Move, and blue rectangle
 
 
 
-## Exercise 2-6: make life easier with a deno JSON script
+## Exercise 2-6: make life easier with npm scripts
 
 It's annoying to have to repeat long CLI commands like:
 
 ```bash
-deno bundle --platform browser src/main.ts -o public/game.js
+npx esbuild src/main.ts --bundle --outfile=public/game.js
 ```
 
-There is a solution! We can create a file `deno.json` and create shortcuts for such instructions.
+There is a solution! We can add a `"scripts"` section to `package.json` with shortcuts for such instructions.
 
 
-1. Create file `deno.json` containing the following:
+1. Replace the contents of `package.json` with the following:
 
     ```json
     {
-      "tasks": {
-        "build": "deno bundle --platform browser src/main.ts -o public/game.js",
-        "check": "deno check src/main.ts",
-        "serve": "deno run --allow-read --allow-write --allow-env --allow-run --allow-net npm:esbuild --servedir=public --serve=127.0.0.1:8000"
+      "name": "ts101-part02",
+      "version": "1.0.0",
+      "private": true,
+      "type": "module",
+      "scripts": {
+        "build": "esbuild src/main.ts --bundle --outfile=public/game.js",
+        "check": "tsc --noEmit",
+        "serve": "esbuild --servedir=public --serve=127.0.0.1:8000"
       },
-      "nodeModulesDir": "auto",
-      "compilerOptions": {
-        "lib": ["dom", "dom.iterable", "esnext"]
+      "devDependencies": {
+        "esbuild": "^0.25.0",
+        "typescript": "^5.9.0"
       }
     }
     ```
@@ -199,31 +246,30 @@ There is a solution! We can create a file `deno.json` and create shortcuts for s
 
 1. Regenerate `/public/game.js` from  `/src/main.ts` with our shortcut
 
-    - type `deno task build` at the command line
+    - type `npm run build` at the command line
 
    TERMINAL DUMP:
     ```bash
-    $ deno task build
-    Task build deno bundle --platform browser src/main.ts -o public/game.js
-    ⚠️  deno bundle is experimental and subject to changes
-    Bundled 1 module in 1ms
-      public/game.js 392B
+    $ npm run build
+
+    > ts101-part02@1.0.0 build
+    > esbuild src/main.ts --bundle --outfile=public/game.js
+
+      public/game.js  447b
+
+    ⚡ Done in 1ms
     ```
 
-Our JSON script has created 3 shortcuts for us:
+Our scripts have created 3 shortcuts for us:
 
-- `deno task build`
-  - this runs `deno bundle --platform browser src/main.ts -o public/game.js`
+- `npm run build`
+  - this runs `esbuild src/main.ts --bundle --outfile=public/game.js`
   - which transpiles  `/src/main.ts` into `/public/game.js`
 
-- `deno task check`
-    - this runs `deno check src/main.ts`
-    - which runs a static code check for file `src/main.ts`
+- `npm run check`
+    - this runs `tsc --noEmit`
+    - which runs a static code check on the TS files in `/src` (using the settings in `tsconfig.json`)
 
-- `deno task serve`
+- `npm run serve`
     - this runs a local web server, so you can view `/public` at http://127.0.0.1:8000/ in your web browser
     - press Ctrl+C to stop the server
-
-And some settings:
-- `"nodeModulesDir": "auto"` lets Deno download npm tools automatically the first time they are needed (the `serve` shortcut uses the **esbuild** tool from npm)
-- `compilerOptions` tells the type checker our code runs in a web page (so it knows about `document`, `HTMLCanvasElement`, ...)
