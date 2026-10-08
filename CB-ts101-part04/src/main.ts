@@ -1,10 +1,11 @@
-import {RED, LIGHT_BLUE} from './constants.ts';
-
 const SCREEN_WIDTH = 800;
 const SCREEN_HEIGHT = 600;
 
-const BACKGROUND_COLOUR = RED;
+const RED = "#ff0000";
+const LIGHT_BLUE = "#add8e6";
 
+const BACKGROUND_COLOUR = RED;
+ 
 // run after page loaded
 addEventListener("load", () => {
   // ----- the screen -----

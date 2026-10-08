@@ -1,24 +1,8 @@
-const SCREEN_WIDTH = 800;
-const SCREEN_HEIGHT = 600;
+// The whole program. Find the element on the page whose id is "output", and change its text.
+//
+// build.ts turns this file into dist/app.js, which dist/index.html runs.
 
-const RED = "#ff0000";
-const LIGHT_BLUE = "#add8e6";
-
-const BACKGROUND_COLOUR = RED;
- 
-// run after page loaded
-addEventListener("load", () => {
-  // ----- the screen -----
-  // the game is drawn on the <canvas> element in index.html
-  const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
-  canvas.width = SCREEN_WIDTH;
-  canvas.height = SCREEN_HEIGHT;
-
-  // the "context" is what you draw with (Java calls this a Graphics object)
-  const g = canvas.getContext("2d")!;
-
-  // ----- draw the screen -----
-  // paint the whole canvas the background colour
-  g.fillStyle = BACKGROUND_COLOUR;
-  g.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-});
+const output = document.querySelector("#output");
+if (output !== null) {
+  output.textContent = "Hello, World!";
+}

@@ -1,0 +1,17 @@
+[session]
+type = "shell"
+
+[[session.shortcut]]
+label = "type check, run src/main.ts and test, once"
+icon = "bs-hammer"
+text = "deno task build"
+
+[[session.shortcut]]
+label = "run the tests, once"
+icon = "bs-clipboard-check"
+text = "deno task test"
+
+[[session.shortcut]]
+label = "lint: look for likely mistakes and bad habits"
+icon = "bs-search"
+text = "deno task lint"

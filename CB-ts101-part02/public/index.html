@@ -2,16 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Apple Move</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Hello, World</title>
   </head>
   <body>
     <main>
-      <h1>🍎 Apple Move</h1>
-      <section class="container canvas-container">
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
-      </section>
-
+      <!-- main.ts replaces the text of the element with id="output" -->
+      <h1 id="output">(if you can read this, dist/app.js has not run - build the project)</h1>
     </main>
-    <script src="game.js"></script>
+    <!-- app.js is built from src/main.ts. Loaded last, so the elements above already exist. -->
+    <script src="app.js"></script>
   </body>
 </html>

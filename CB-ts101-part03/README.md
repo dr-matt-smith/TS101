@@ -1,205 +1,177 @@
-# TypeScript 101 - part 03 - build tooling, to combine all TS scripts into a single JS
+# TypeScript 101 - part 03 - build an HTML/CSS/JS site from TS source
 
-Rather than working directly in `/public`, and rather than individually transpiling each TS file into a JS file, a typical project setup for a TS-driven website game is as follows:
-- final site output in `/dist`
+A simple TS-driven website can be as simple as follows:
 - TS source code in `/src`
 - HTML/CSS/images to populate final site in `/public`
-- a TS build script in `build.ts`
-   - which builds ALL source files ingto a single `/dist/game.js` script
-
-So we can upload/ZIP and share the contents of the `/dist` folder
-- "dist" is short for "distribution" ...
-
+  - a `<script>` element in the HTML code to read transpiled JavaScript
+- the final site is built into `/dist`
+  - `/src/main.ts` -> `/dist/app.js` (TypeScript transpiled into JavaScript)
+  - `/public/index.html` -> `/dist/index.html` (copied as-is)
 
 
-
-![Celbridge our build process](README_images/6_build_ts.webp)
-
-
-> This README uses **Deno**. No Deno on your computer (e.g. the college lab PCs)?
-> Use [README_node.md](README_node.md) instead - it's the same exercises, with Node commands.
+> This README uses **Deno**.
 >
-> See [README_deno_TS_workflow.md](README_deno_TS_workflow.md) for all the Deno build and serve commands.
+> See [README_deno_TS_workflow.md](README_deno_TS_workflow.md) for all the Deno build commands.
 
-## Exercise 3-1: Make a copy of the previous project
+## Running the finished project
 
-1. copy the previous project
+Open the project in Celbridge. The console at the bottom (`terminal.console`) starts by itself, and runs `deno task dev`:
 
-delete `/public/game.js` (if it exists)
+1. **builds** `src/` (TypeScript) and `public/` (HTML, CSS, images) into `dist/`
+2. **tests** everything in `tests/`, and writes a readable report to `test_output/index.html`
+3. **watches** - every time you save a file in `src/`, `public/` or `tests/`, it does it all again
 
-Now, the contents of `public` are files that will be copied, unchanged, into the `dist` folder when we build the project
+`dist/index.html` opens beside the console. After a rebuild, press its **refresh** button to see your changes.
 
-We don't want to keep 'stale' JS files around
-- we'll build a fresh `/dist/game.js` whenever we need to ...
+(Part 4 looks at this build tooling in more detail.)
 
-## Exercise 3-2: Create a general-purpose TS build script `build.ts`
+## Exercise 3-1: Start from a copy of the part 2 project
 
-1. create a TS build script `build.ts`
+Do the following:
 
-(don't worry too much about the contents of this tool - just have it in your project to make your life much easier!)
+1. copy the part 2 (Hello, World) project
+    - it has all the build tooling we need: `build.ts`, `deno.json`, `terminal.console`, `tools/` and `tests/`
 
-When we have edited TypeScript files, we want to then transpile (translate) them into JavaScript, and combine them all into a single file `/game.js`
+1. delete these 3 files - we're going to write our own:
+    - `src/main.ts`
+    - `public/index.html`
+    - `public/styles.css`
 
-This `build.ts` will do this for us
-- since we have Deno, we can write useful scripts in TypeScript, since Deno can run TypeScript files directly
-- the same `build.ts` works with both Deno and Node - it uses the **esbuild** tool to do the bundling
+1. open the copied project in Celbridge
+    - the console starts `deno task dev`, which waits for you to save a file in `src/`, `public/` or `tests/`
+    - (it will report errors until you have created `src/main.ts` - that's fine)
 
-This script will transpile all the TS script in `/src` into a single JS file as `/dist/game.js`.
-- to run once we'd run at the terminal `deno task build`
-- to watch TS files for changes, and then automatically rebuild `/dist/game.js` we'd run at the terminal `deno task dev`
+## Exercise 3-2: Create HTML page in `/public`
+
+1. create folder `/public`, and inside create `index.html`, containing the following:
+
+NOTE: You may need to context menu (right mouse click) to open the document with the Code Editor
+
+![Celbridge open HTML with Code Editor](README_images/0_html_code_editor.webp)
+
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Apple Move</title>
+  </head>
+  <body>
+    <main>
+      <h1>🍎 Apple Move</h1>
+      <section class="container canvas-container">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+      </section>
+
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
+```
+
+NOTE:
+- you'll see how our `<script>` element reads `app.js`
+- TypeScript sources files are translated into JavaScript `.js` when distributed/published on the web
+
+![Celbridge new index.html documment](README_images/1_index_html.webp)
+
+## Exercise 3-3: Create a simple `main.ts` in  folder `/src`
 
 ```ts
-// Builds src/ (TypeScript) and public/ (static assets) -> dist/
-//   - src/main.ts + everything it imports -> dist/game.js   (bundled into ONE plain script)
-//   - public/**/*                         -> dist/**/*      (HTML, CSS, images, ... copied as-is)
-//
-// Works with both Node and Deno:
-//   Run once:                npm run build   OR   deno task build
-//   Watch & rebuild on save: npm run dev     OR   deno task dev
-import { spawnSync } from "node:child_process";
-import { copyFileSync, mkdirSync, readdirSync, rmSync } from "node:fs";
-import { createRequire } from "node:module";
-import process from "node:process";
-import * as esbuild from "esbuild";
+const SCREEN_WIDTH = 800;
+const SCREEN_HEIGHT = 600;
 
-const isDeno = "Deno" in globalThis;
+const RED = "#ff0000";
+const LIGHT_BLUE = "#add8e6";
 
-// start with an empty dist/ folder, so no old files are left behind
-rmSync("dist", { recursive: true, force: true });
-mkdirSync("dist", { recursive: true });
+const BACKGROUND_COLOUR = LIGHT_BLUE;
+ 
+// run after page loaded
+addEventListener("load", () => {
+  // ----- the screen -----
+  // the game is drawn on the <canvas> element in index.html
+  const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
+  canvas.width = SCREEN_WIDTH;
+  canvas.height = SCREEN_HEIGHT;
 
-// 1. Type check the TypeScript (bundling only strips the types, it doesn't check them).
-//    Errors are reported, but the game is still built so you can keep experimenting.
-//    Deno has a type checker built in; Node uses the TypeScript compiler from node_modules.
-const checkArgs = isDeno
-  ? ["check", "src/main.ts"]
-  : [createRequire(import.meta.url).resolve("typescript/bin/tsc"), "--noEmit"];
-const check = spawnSync(process.execPath, checkArgs, { stdio: "inherit" });
-if (check.status !== 0) {
-  console.log("TypeScript found errors (see above) - the game was still built, but may not work");
-}
+  // the "context" is what you draw with (Java calls this a Graphics object)
+  const g = canvas.getContext("2d")!;
 
-// 2. Bundle src/main.ts and every file it imports into dist/game.js.
-await esbuild.build({
-  entryPoints: ["src/main.ts"],
-  bundle: true,
-  format: "iife", // a plain <script>, not a module
-  outfile: "dist/game.js",
-  logLevel: "warning",
+  // ----- draw the screen -----
+  // paint the whole canvas the background colour
+  g.fillStyle = BACKGROUND_COLOUR;
+  g.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 });
-await esbuild.stop(); // Deno waits for esbuild's helper process, so shut it down
-console.log("Built dist/game.js from src/main.ts (and the files it imports)");
-
-// 3. Copy every file under public/ (HTML, CSS, images, ...) as-is.
-function copyFolder(from: string, to: string) {
-  mkdirSync(to, { recursive: true });
-  for (const entry of readdirSync(from, { withFileTypes: true })) {
-    const fileSrc = `${from}/${entry.name}`;
-    const fileOut = `${to}/${entry.name}`;
-    if (entry.isDirectory()) {
-      copyFolder(fileSrc, fileOut);
-    } else if (entry.name !== ".DS_Store" && !entry.name.endsWith(".cel")) {
-      copyFileSync(fileSrc, fileOut);
-      console.log(`Copied ${fileOut} from ${fileSrc}`);
-    }
-  }
-}
-copyFolder("public", "dist");
 ```
+![Celbridge main.ts document](README_images/2_main_ts.webp)
 
-![Celbridge build.ts document](README_images/3_build_ts.webp)
+NOTE:
+- this TS script defines some constants for screen size and colors
+- then defines an event handler function for the page `load` event
+- when the page is loaded, the canvas will be covered with a rectangle filled with the background colour
 
-## Exercise 3-3: Declare shortcuts and dependencies in `deno.json`
+## Exercise 3-4: Watch the console build `/dist`
 
-Our build script needs a shortcut, and a dependent library (esbuild), which we can declare in our `deno.json` file.
-
-1. So replace the contents of `deno.json` with the following:
-
-```json
-{
-  "tasks": {
-    "build": "deno run --allow-read --allow-write --allow-env --allow-run build.ts",
-    "dev": "deno run --watch=src,public --allow-read --allow-write --allow-env --allow-run build.ts",
-    "check": "deno check src/main.ts",
-    "serve": "deno run --allow-read --allow-write --allow-env --allow-run --allow-net npm:esbuild --servedir=dist --serve=127.0.0.1:8000"
-  },
-  "imports": {
-    "esbuild": "npm:esbuild@^0.25.0"
-  },
-  "nodeModulesDir": "auto",
-  "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"]
-  }
-}
-```
-
-We have now declared 4 shortcuts:
-- `deno task build`
-  - this will take all TS files in `/src` and combine them into a single JS file `/dist/game.js`
-- `deno task dev`
-  - this automates the previous action - so deno WATCHES for file changes in `/src` and `/public`, and when a file is updated, it automatically re-builds `/dist`
-- `deno task check`
-  - this allows us to run a static type check on our TS files, to help avoid run-time errors ...
-- `deno task serve`
-  - this runs a local web server, so you can view `/dist` at http://127.0.0.1:8000/ (press Ctrl+C to stop it)
-
-And some settings:
-- `imports` tells Deno where to download `esbuild` from (the npm package library)
-- `"nodeModulesDir": "auto"` lets Deno download npm packages like esbuild automatically, the first time they are needed
-- `compilerOptions` tells the type checker our code runs in a web page (so it knows about `document`, `HTMLCanvasElement`, ...)
-
-## Exercise 3-4: Build the `dist` folder from source
-
-Run the build by typing in the console line:
-
-```bash
-deno task build
-```
+As soon as you save `src/main.ts`, the console rebuilds the project:
 
 TERMINAL DUMP:
 ```bash
-$ deno task build
-Task build deno run --allow-read --allow-write --allow-env --allow-run build.ts
-Check src/main.ts
-Built dist/game.js from src/main.ts (and the files it imports)
-Copied dist/index.html from public/index.html
+=== Build started at 10:37:14 AM ===
+Built dist/app.js from src/main.ts (and the files it imports)
+Copied 1 file(s) from public/ to dist/
+dist/ is up to date (0.7s) - press refresh on the dist/index.html preview
+
+Tests: 0 failed, 0 passed, 0 skipped, 0 type errors, 1 lint warnings  ->  test_output/index.html
+
+Watching src/, public/ and tests/ - save a file to rebuild and retest (Ctrl+C to stop)
 ```
 
-(The very first time, you'll also see some `Initialize esbuild...` lines, as Deno downloads esbuild.)
+NOTE:
+- `src/main.ts` has been transpiled (TypeScript -> JavaScript) into `dist/app.js`
+- `public/index.html` has been copied into `dist/index.html`
+- the 1 lint warning is because `RED` is never used - harmless here (the report in `test_output/index.html` shows the details)
 
-You now have a `dist` folder containing your HTML game!
-- but you may not be able to see it yet, due to a default setting in Celbridge
-- we'll fix this in the next step
+## Exercise 3-5: View the web page
 
-![Celbridge hidden dist folder](README_images/5_hidden_dist_folder.webp)
+Now open `/dist/index.html` with the HTML Viewer
+- the context menu (right mouse click) lets you choose the HTML Viewer
+- (in the finished project, it opens beside the console by itself)
 
-## Exercise 3-5: Configuring Celbridge to show the `dist` folder
+![Celbridge open HTML with HTML Viewer](README_images/4_html_html_viewer.webp)
 
-Usually we would `.gitignore` the `dist` folder, and so this folder is hidden by default in teh Celbridge workbench.
+You should now see the web page, with text Apple Move, and blue rectangle
+- which will be the drawing canvas we can code our TypeScript game to run within ...
 
-So we need to tweak a project setting, so that we can hide/show this folder, for when we want to preview `/dist/index.html`.
-
-1. Open the Celbridge settings
-   - click the setting slider button in the utilities panel on the left
-   - (second from bottom, above the community button)
-
-1. The **Project Settings** document should open as a tabbed document
-
-1. Select the **Resources** tab
-
-1. Delete `dist` from the list at the bottom fo the page
-   - the list of **Excluded from search** items
-
-1. Click the **Reload Project** button
-   - after updating project settings, you need to reload the project for the changes to take effect
-
-![Celbridge remove dist from exclude list](README_images/4_remove_dist_from_exlude_list.webp)
+![Celbridge web page with blue canvas](README_images/5_web_page_blue_canvas.bmp)
 
 
-## Exercise 3-6: View the `dist` folder
+## Exercise 3-6: Change the background to red
 
-You should now be able to see the `dist` folder
+1. In file `/src/main.ts` edit line 7, so that the `BACKGROUND_COLOUR` constant is set to `RED` not `LIGHT_BLUE`:
 
+    ```ts
+    const SCREEN_WIDTH = 800;
+    const SCREEN_HEIGHT = 600;
+    
+    const RED = "#ff0000";
+    const LIGHT_BLUE = "#add8e6";
+    
+    const BACKGROUND_COLOUR = RED;
+     
+    ...
+    ```
 
-![Celbridge visible dist folder](README_images/7_dist_folder_visible.webp)
+1. save the file - the console rebuilds `/dist` for you
 
+1. refresh the HTML page view, to see the new JS code executed:
+
+    - press the **refresh** button on the `dist/index.html` preview
+    - you should now see the updated JS code run showing a RED background to our canvas rectangle
+    
+    ![Celbridge reload index.html to see red background](README_images/6_reopen_red.bmp)
+
+NOTE:
+- edit files in `/src` and `/public` - never in `/dist`, since every build replaces what's in there
+- no web server is needed: `/dist` is a plain web page, so you can also open `dist/index.html` in any web browser

@@ -1,9 +1,23 @@
 # TypeScript 101 - part 01 - Set up a TS project, run main and typecheck a function call
 
-> This README uses **Deno**. No Deno on your computer (e.g. the college lab PCs)?
-> Use [README_node.md](README_node.md) instead - it's the same exercises, with Node commands.
+> This README uses **Deno**.
 >
 > See [README_deno_TS_workflow.md](README_deno_TS_workflow.md) for a summary of the Deno commands.
+
+## Running the finished project
+
+Open the project in Celbridge. The console at the bottom (`terminal.console`) starts by itself, and runs `deno task dev`:
+
+1. **type checks** `src/` and `tests/`, and lists any type errors
+2. **runs** `src/main.ts`, so you see what it prints
+3. **tests** everything in `tests/`, printing the results in the console (in TAP format) and writing a
+   readable report to `test_output/index.html` (it opens beside the console - press its **refresh** button after a save)
+4. **watches** - every time you save a file in `src/` or `tests/`, it does it all again
+
+The console's buttons: rerun-and-watch, run once, test once, and lint. To use them while the
+watcher is running, press **Ctrl+C** first to stop it.
+
+The exercises below show you how to build this project yourself, step by step.
 
 ## Exercise 1-1: Install deno
 
@@ -14,11 +28,9 @@ Do the following:
 https://deno.com/
 
 
-NOTE:
-- I'm assuming you are using **deno** for your TypeScript projects
+You can install deno from the Windows Powershell (default) terminal:
+  - `irm https://deno.land/install.ps1 | iex`
 
-- you could also be using **Node** (v26 or later) - in which case follow [README_node.md](README_node.md) instead,
-  which is the same exercises, with Node commands
 
 ## Exercise 1-2: test your deno setup
 
@@ -71,7 +83,7 @@ typescript 6.0.3
 
 ## Exercise 1-3: Create hello world TypeScript project
 
-1. create (and open) file `main.ts` containing the following:
+1. create folder `/src`, and inside it create (and open) file `main.ts` containing the following:
 
 ```ts
 console.log('Hello, World.');
@@ -84,12 +96,12 @@ console.log('Hello, World.');
 2. test your script with **deno**:
 
 ```bash
-deno run main.ts
+deno run src/main.ts
 ```
 
 TERMINAL DUMP:
 ```bash
-$ deno run main.ts
+$ deno run src/main.ts
 Hello, World.
 ```
 
@@ -97,10 +109,10 @@ Hello, World.
 
 ## Exercise 1-4: Test type checking with a function
 
-1. create (and open) file `my_functions.ts` containing the following function `sayHello(<string>)`:
+1. create (and open) file `src/my_functions.ts` containing the following function `sayHello(<string>)`:
 
 ```ts
-// my_functions.ts
+// src/my_functions.ts
 export function sayHello(name: string): string {
     return "Hello " + name.toUpperCase();
 }
@@ -108,10 +120,10 @@ export function sayHello(name: string): string {
 
 ![Celbridge my_functions.ts TypeScript document](README_images/7_my_functions.webp)
 
-2. Edit `main.ts` to call the function with a string, then a number:
+2. Edit `src/main.ts` to call the function with a string, then a number:
 
 ```ts
-// main.ts
+// src/main.ts
 import {sayHello} from './my_functions.ts';
 
 const name1 = 'matt';
@@ -128,17 +140,17 @@ console.log(output);
 3. get **deno** to check the scripts:
 
 ```bash
-deno check main.ts
+deno check src/main.ts
 ```
 
 TERMINAL DUMP:
 ```bash
-$ deno check main.ts
-Check main.ts
+$ deno check src/main.ts
+Check src/main.ts
 TS2345 [ERROR]: Argument of type 'number' is not assignable to parameter of type 'string'.
 output = sayHello(name2);
                   ~~~~~
-    at file:///Users/matt/Downloads/ts101-part01-exercise1-1/main.ts:8:19
+    at file:///Users/matt/Downloads/ts101-part01-exercise1-1/src/main.ts:8:19
 
 error: Type checking failed.
 ```
@@ -146,7 +158,7 @@ error: Type checking failed.
 ![Celbridge checking main.ts](README_images/9_deno_check_types.webp)
 
 NOTE:
-- the error occurs at line 8, since this is when `main.ts` is passing a number (`33` inside `name2` to the function expecting a string)
+- the error occurs at line 8, since this is when `src/main.ts` is passing a number (`33` inside `name2` to the function expecting a string)
 
 
 

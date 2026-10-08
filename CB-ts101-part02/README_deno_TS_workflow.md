@@ -1,11 +1,12 @@
 # TypeScript workflow with Deno
 
-These steps are for computers where **Deno** is installed.
-If you have Node instead (e.g. the college lab PCs), see [README_node_TS_workflow.md](README_node_TS_workflow.md).
-
 All commands are typed in the console (terminal), in the project folder - the folder containing `deno.json`.
+In Celbridge, `terminal.console` runs `deno task dev` for you when it opens, and has a button for each task.
 
-In this project, the TypeScript in `src/main.ts` is turned into `public/game.js`, which `public/index.html` loads.
+In this project:
+- the TypeScript in `src/main.ts` (and every file it imports) is bundled into `dist/app.js`
+- everything in `public/` (HTML, CSS, images, ...) is copied into `dist/`
+- the tests in `tests/` are run, and the results written to `test_output/index.html`
 
 
 ## What you need
@@ -16,80 +17,66 @@ Deno **version 2 or later**. Check your version with:
 deno --version
 ```
 
-
-## Step 1: Install the build tools (not needed!)
-
-There is **no install step** with Deno - it has a bundler and a TypeScript type checker built in.
-
-The first time you run `deno task serve`, Deno automatically downloads the web server it uses (`esbuild`)
-into a `node_modules/` folder. That first run needs an internet connection; after that everything works offline.
+There is **no install step** - Deno has a bundler, a TypeScript type checker, a linter and a test runner built in.
+The first build downloads the testing library (`@std/assert`), so it needs an internet connection; after that everything works offline.
 
 
-## Step 2: Build the project
+## Build, test, and rebuild on every save
 
 ```bash
-deno task build
+deno task dev
 ```
 
-This transpiles `src/main.ts` (and every file it imports) into `public/game.js`.
+This runs `build.ts`, which:
+1. type checks `src/` and `tests/`, and lists any type errors
+2. bundles `src/main.ts` (and every file it imports) into `dist/app.js`
+3. copies everything in `public/` into `dist/`
+4. removes anything in `dist/` that no longer comes from `public/`
+5. runs the tests in `tests/`, and writes the report to `test_output/index.html`
+
+...then does it all again every time you save a file in `src/`, `public/` or `tests/`. Press **Ctrl+C** to stop.
 
 TERMINAL DUMP:
 ```bash
-$ deno task build
-Task build deno bundle --platform browser src/main.ts -o public/game.js
-⚠️  deno bundle is experimental and subject to changes
-Bundled 1 module in 5ms
-  public/game.js 392B
+$ deno task dev
+Task dev deno run --watch=src/,public/,tests/ --allow-read --allow-write --allow-run --allow-env build.ts --watching
+Watcher Process started.
+
+=== Build started at 10:41:19 AM ===
+Built dist/app.js from src/main.ts (and the files it imports)
+Copied 2 file(s) from public/ to dist/
+dist/ is up to date (0.2s) - press refresh on the dist/index.html preview
+
+Tests: 0 failed, 0 passed, 0 skipped, 0 type errors, 0 lint warnings  ->  test_output/index.html
+
+Watching src/, public/ and tests/ - save a file to rebuild and retest (Ctrl+C to stop)
 ```
 
-Building does **not** check your types - use `deno task check` for that (see below).
+If there are type errors, they are listed first, followed by
+`TypeScript found errors (see above) - the page was still built, but may not work`.
+Fix the errors, and save again.
 
 
-## Step 3: Serve the contents of `public/`
+## View the page
 
-```bash
-deno task serve
-```
+No web server is needed: `dist/` is a plain web page.
 
-TERMINAL DUMP:
-```bash
-$ deno task serve
-Task serve deno run --allow-read --allow-write --allow-env --allow-run --allow-net npm:esbuild --servedir=public --serve=127.0.0.1:8000
-
- > Local: http://127.0.0.1:8000/
-```
-
-Open **http://127.0.0.1:8000/** in your web browser to see the game.
-
-- The server keeps running until you press **Ctrl+C**
-- Each page request is logged in the console, e.g. `"GET /game.js" 200`
-- After rebuilding, **refresh the browser page** to see your changes
+- in Celbridge, `dist/index.html` opens beside the console
+  - after a rebuild, press its **refresh** button to see your changes
+- or open `dist/index.html` in any web browser
 
 
-## Check for type errors
+## The other tasks
 
-```bash
-deno task check
-```
-
-TERMINAL DUMP:
-```bash
-$ deno task check
-Task check deno check src/main.ts
-Check src/main.ts
-```
-
-No errors listed means your types are all OK.
-
-
-## Summary of commands
+To use these while `deno task dev` is running, press **Ctrl+C** first to stop it.
 
 | Command | What it does |
 |---|---|
-| *(no install step)* | Deno has the build tools built in |
-| `deno task build` | Transpile `src/main.ts` into `public/game.js` |
-| `deno task check` | Type check `src/main.ts` |
-| `deno task serve` | Serve `public/` at http://127.0.0.1:8000/ (Ctrl+C to stop) |
+| `deno task dev` | Build and test, then again every time you save (Ctrl+C to stop) |
+| `deno task build` | Build and test, once |
+| `deno task test` | Only run the tests (and type check) |
+| `deno task check` | Only type check `src/` and `tests/` |
+| `deno task lint` | Look for likely mistakes and bad habits |
 
 Each `deno task ...` command runs the matching entry in the `"tasks"` section of `deno.json`.
 
@@ -98,7 +85,7 @@ Each `deno task ...` command runs the matching entry in the `"tasks"` section of
 
 | Problem | Fix |
 |---|---|
-| `Task not found: build` | You're not in the project folder - `cd` into the folder containing `deno.json` |
-| `Could not find npm package 'esbuild'` | The first `serve` needs an internet connection to download esbuild - connect and try again |
-| `address already in use` when serving | A server is already running (maybe in another console) - stop it with Ctrl+C, or just use the one that is running |
-| Browser shows an old version of the game | Did you rebuild? Then refresh the page (Ctrl+Shift+R forces a full reload) |
+| `Task not found: dev` | You're not in the project folder - `cd` into the folder containing `deno.json` |
+| `deno: command not found` | Deno isn't installed (or the console was opened before installing it - open a new one) |
+| `JSR package not found` / download errors | The first build needs an internet connection to download `@std/assert` - connect and try again |
+| The page shows an old version of the game | Is `deno task dev` still running? Then press **refresh** on the page |

@@ -1,229 +1,177 @@
-# TypeScript 101 - part 02 - build an HTML/CSS/JS site from TS source
+# TypeScript 101 - part 02 - Hello, World in a web page
 
-A simple TS-driven website can be as simple as follows:
+The smallest possible web project: one TypeScript file, `src/main.ts`, that puts a message on a web page.
+
+From now on, every project has the same layout, and the same build tooling:
 - TS source code in `/src`
-- HTML/CSS/images to populate final site in `/public`
-  - a `<script>` element in the HTML code to read transpiled JavaScript
-  - e.g. `/src/main.ts` -> `/public/game.js`
+- HTML/CSS/images in `/public`
+- tests in `/tests`
+- the final web page is built into `/dist` (short for "distribution")
+  - `/src/main.ts` -> `/dist/app.js` (TypeScript transpiled into JavaScript)
+  - `/public/index.html` -> `/dist/index.html` (copied as-is)
 
 
-
-> This README uses **Deno**. No Deno on your computer (e.g. the college lab PCs)?
-> Use [README_node.md](README_node.md) instead - it's the same exercises, with Node commands.
+> This README uses **Deno**.
 >
-> See [README_deno_TS_workflow.md](README_deno_TS_workflow.md) for all the Deno build and serve commands.
+> See [README_deno_TS_workflow.md](README_deno_TS_workflow.md) for all the Deno build commands.
 
-## Exercise 2-1: Create HTML page in `/public`
+## Exercise 2-1: Open the project, and see the page
 
-Do the following:
+1. open this project in Celbridge (click `ts101_part02.celbridge`)
 
-1. start with a new, empty Celbridge project
-    - and add a default shell console document (`shell.console`)
+Three things open by themselves:
+1. **the console**, at the bottom, which immediately runs `deno task dev` (see below)
+2. **`dist/index.html`**, at the side, shown as a preview: this is your web page
+3. **`README.md`**, this file
 
-1. create folder `/public`, and inside create `index.html`, containing the following:
+A fourth shortcut, with a clipboard icon, opens the **test report** (`test_output/index.html`).
 
-NOTE: You may need to context menu (right mouse click) to open the document with the Code Editor
+You should see the web page say **Hello, World!**
 
-![Celbridge open HTML with Code Editor](README_images/0_html_code_editor.webp)
-
-
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Apple Move</title>
-  </head>
-  <body>
-    <main>
-      <h1>🍎 Apple Move</h1>
-      <section class="container canvas-container">
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
-      </section>
-
-    </main>
-    <script src="game.js"></script>
-  </body>
-</html>
-```
+![Hello, World web page](README_images/hello_world.png)
 
 NOTE:
-- you'll see how our `<script>` element reads `game.js`
-- TypeScript sources files are translated into JavaScript `.js` when distributed/published on the web
+- the first build downloads one small package (Deno's library for tests), so it needs an internet connection - after that everything works offline
+- if the page is blank, press the **refresh** button on the preview - the very first build may have finished after the preview opened
 
-![Celbridge new index.html documment](README_images/1_index_html.webp)
+## What happens when you save
 
-## Exercise 2-2: Create a simple `main.ts` in  folder `/src`
+`deno task dev` does five things, then waits. Every time you save a file in `src/`, `public/` or `tests/`, it does them all again:
 
-```ts
-const SCREEN_WIDTH = 800;
-const SCREEN_HEIGHT = 600;
+![What deno task dev does](README_images/dev_loop.svg)
 
-const RED = "#ff0000";
-const LIGHT_BLUE = "#add8e6";
-
-const BACKGROUND_COLOUR = LIGHT_BLUE;
- 
-// run after page loaded
-addEventListener("load", () => {
-  // ----- the screen -----
-  // the game is drawn on the <canvas> element in index.html
-  const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
-  canvas.width = SCREEN_WIDTH;
-  canvas.height = SCREEN_HEIGHT;
-
-  // the "context" is what you draw with (Java calls this a Graphics object)
-  const g = canvas.getContext("2d")!;
-
-  // ----- draw the screen -----
-  // paint the whole canvas the background colour
-  g.fillStyle = BACKGROUND_COLOUR;
-  g.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-});
-```
-![Celbridge main.ts document](README_images/2_main_ts.webp)
-
-NOTE:
-- this TS script defines some constants for screen size and colors
-- then defines an event handler function for the page `load` event
-- when the page is loaded, the canvas will be covered with a rectangle filled with a red color
-
-## Exercise 2-3: Create our JS from our TS script
-
-
-1. get deno to transpile `/src/main.ts` -> `/public/game.js`
-
-At the terminal, run:
-
-```bash
-deno bundle --platform browser --watch src/main.ts -o public/game.js
-```
+1. **type checks** every `.ts` file and lists any errors (the page is still built, so you can keep experimenting - but read the errors, they are nearly always a real bug)
+2. **bundles** `src/main.ts`, and every file it imports, into one JavaScript file, `dist/app.js`
+3. **copies** everything in `public/` (the HTML page, its CSS, any images) into `dist/`
+4. **tidies** `dist/`, removing anything that is no longer in `public/`
+5. **runs the tests** in `tests/`, prints the results, and writes a report to `test_output/`
 
 TERMINAL DUMP:
 ```bash
-$ deno bundle --platform browser src/main.ts -o public/game.js
-⚠️  deno bundle is experimental and subject to changes
-Bundled 1 module in 2ms
-  public/game.js 406B
+$ deno task dev
+Task dev deno run --watch=src/,public/,tests/ --allow-read --allow-write --allow-run --allow-env build.ts --watching
+Watcher Process started.
 
-CB-ts101-part02 % 
+=== Build started at 10:41:19 AM ===
+Built dist/app.js from src/main.ts (and the files it imports)
+Copied 2 file(s) from public/ to dist/
+dist/ is up to date (0.2s) - press refresh on the dist/index.html preview
+
+Tests: 0 failed, 0 passed, 0 skipped, 0 type errors, 0 lint warnings  ->  test_output/index.html
+
+Watching src/, public/ and tests/ - save a file to rebuild and retest (Ctrl+C to stop)
+Watcher Process finished. Restarting on file change...
 ```
 
+(There are no tests yet - `tests/` just has a `README.md` in it, for now.)
 
-## Exercise 2-4: View the HTML file
+When `dist/` changes, the **refresh** button on the `dist/index.html` preview lights up. Press it to see your changes.
 
-We won't need to edit the HTML file again, so now we can just view it (rendered as a web page)
+The console has buttons too: rebuild-and-watch, build once, test once, and lint. If `deno task dev` is running (it usually is), press **Ctrl+C** in the console before using them.
 
+NOTE:
+- there is no web server - the build makes one plain `<script>` file, which a browser is happy to load straight from your disk
+- so `dist/index.html` works in Celbridge's preview, or in any web browser
 
-So now use the `/public/index.html` context menu (right mouse click) to open the document with the HTML Viewer
+## A project's files
 
-![Celbridge open HTML with Code Editor](README_images/4_html_html_viewer.webp)
+| File or folder | What it is | Do you edit it? |
+|---|---|---|
+| `src/` | your TypeScript: `main.ts`, and other files as the project grows | yes - this is your program |
+| `tests/` | your tests, in files ending `.test.ts` | yes |
+| `public/` | `index.html`, `styles.css`, and any images | yes |
+| `dist/` | the built page - **made by the build** | no - it is overwritten on every save |
+| `test_output/` | the test report - made by the build | no |
+| `deno.json` | the project's settings: its tasks (`dev`, `build`, `test`, ...) | rarely |
+| `build.ts`, `tools/` | the build and the test report | no |
+| `terminal.console`, `*.celbridge` | Celbridge's console and project settings | no |
 
-You should now see the web page, with text Apple Move, and blue rectangle
-- which will be the drawing canvas we can code our TypeScript game to run within ...
+The rule to remember: **change `src/`, `public/` and `tests/`; look at `dist/` and `test_output/`**.
 
-![Celbridge open HTML with Code Editor](README_images/5_web_page_blue_canvas.bmp)
+## Exercise 2-2: Read the code
 
+The TypeScript file, `src/main.ts`, is four lines long:
 
-## Exercise 2-5: Change the background to red
-
-1. In file `/src/main.ts` edit line 7, so that the `BACKGROUND_COLOUR` constant is set to `RED` not `LIGHT_BLUE`:
-
-    ```ts
-    const SCREEN_WIDTH = 800;
-    const SCREEN_HEIGHT = 600;
-    
-    const RED = "#ff0000";
-    const LIGHT_BLUE = "#add8e6";
-    
-    const BACKGROUND_COLOUR = RED;
-     
-    ...
-    ```
-1. get deno to transpile the updated `/src/main.ts` -> `/public/game.js`
-
-    At the terminal, run:
-    
-    ```bash
-    deno bundle --platform browser --watch src/main.ts -o public/game.js
-    ```
-    
-    TERMINAL DUMP:
-    ```bash
-    $ deno bundle --platform browser src/main.ts -o public/game.js
-    ⚠️  deno bundle is experimental and subject to changes
-    Bundled 1 module in 2ms
-      public/game.js 406B
-    
-    CB-ts101-part02 % 
-    ```
-
-1. refresh the HTML page view, to see the new JS code executed:
-
-    Now, for the document tab for `index.html` use the context (right-mouse button) menu, and reload the document
-    - you should now see the updated JS code run showing a RED background to our canvas rectangle
-    
-    ![Celbridge reopen index.HTML to see red background](README_images/6_reopen_red.bmp)
-
-
-
-## Exercise 2-6: make life easier with a deno JSON script
-
-It's annoying to have to repeat long CLI commands like:
-
-```bash
-deno bundle --platform browser src/main.ts -o public/game.js
+```ts
+const output = document.querySelector("#output");
+if (output !== null) {
+  output.textContent = "Hello, World!";
+}
 ```
 
-There is a solution! We can create a file `deno.json` and create shortcuts for such instructions.
+And the web page it changes, `public/index.html`:
 
+```html
+<h1 id="output">(if you can read this, dist/app.js has not run - build the project)</h1>
+...
+<script src="app.js"></script>
+```
 
-1. Create file `deno.json` containing the following:
+A web page is a tree of **elements** - headings, paragraphs, lists, buttons. The browser keeps a
+model of the page, with one object for every element, called the **DOM** (Document Object Model).
+Your TypeScript can find an element and change it.
 
-    ```json
-    {
-      "tasks": {
-        "build": "deno bundle --platform browser src/main.ts -o public/game.js",
-        "check": "deno check src/main.ts",
-        "serve": "deno run --allow-read --allow-write --allow-env --allow-run --allow-net npm:esbuild --servedir=public --serve=127.0.0.1:8000"
-      },
-      "nodeModulesDir": "auto",
-      "compilerOptions": {
-        "lib": ["dom", "dom.iterable", "esnext"]
-      }
-    }
-    ```
+- `document` is the whole page
+- `document.querySelector("#output")` finds the element whose `id` is `output`
+  - it uses CSS selectors: `#output` means "the element with id output"
+- `querySelector` gives back **`null`** if no element matches - if the id was mistyped, say
+  - TypeScript knows this, and will not let you use `output` until you have checked that it is not `null` - that is what the `if` is for
+  - (Java would let you forget, and throw a `NullPointerException` when the program runs. TypeScript stops you before it runs)
+- `output.textContent = "Hello, World!";` replaces the text inside the element
 
-1. Delete `/public/game.js`
+The `<script src="app.js">` line, at the end of the page, runs the JavaScript the build made from
+`main.ts`. It comes last so that the elements above it already exist when it runs. If you ever see
+the "(if you can read this ...)" text, the script did not run - look at the console for an error.
 
-1. Regenerate `/public/game.js` from  `/src/main.ts` with our shortcut
+NOTE: `const`
+- `const output = ...` declares a variable that can never be given a new value, like a `final` variable in Java
+- there is no type: TypeScript **infers** the type from the value
+- it is still checked - you could not later put a number in `output`
 
-    - type `deno task build` at the command line
+## Exercise 2-3: Change the message
 
-   TERMINAL DUMP:
-    ```bash
-    $ deno task build
-    Task build deno bundle --platform browser src/main.ts -o public/game.js
-    ⚠️  deno bundle is experimental and subject to changes
-    Bundled 1 module in 1ms
-      public/game.js 392B
-    ```
+1. change the message in `src/main.ts`, and save
+1. watch the console rebuild
+1. press **refresh** on the `dist/index.html` preview, to see your new message
 
-Our JSON script has created 3 shortcuts for us:
+## Exercise 2-4: Hello, you
 
-- `deno task build`
-  - this runs `deno bundle --platform browser src/main.ts -o public/game.js`
-  - which transpiles  `/src/main.ts` into `/public/game.js`
+Change the program so that the name is in a constant of its own, and the page says
+"Hello, *your name*!". Try it before reading on.
 
-- `deno task check`
-    - this runs `deno check src/main.ts`
-    - which runs a static code check for file `src/main.ts`
+Here is one way:
 
-- `deno task serve`
-    - this runs a local web server, so you can view `/public` at http://127.0.0.1:8000/ in your web browser
-    - press Ctrl+C to stop the server
+```ts
+const NAME = "Ada";
 
-And some settings:
-- `"nodeModulesDir": "auto"` lets Deno download npm tools automatically the first time they are needed (the `serve` shortcut uses the **esbuild** tool from npm)
-- `compilerOptions` tells the type checker our code runs in a web page (so it knows about `document`, `HTMLCanvasElement`, ...)
+const output = document.querySelector("#output");
+if (output !== null) {
+  output.textContent = `Hello, ${NAME}!`;
+}
+```
+
+NOTE:
+- the message is in **backticks** (`` ` ``), not quotes
+  - a string in backticks is a *template literal*: anything inside `${...}` is worked out and put into the string
+  - it does the job of `"Hello, " + name + "!"` in Java, but is easier to read
+- `NAME` is in capitals because it is a fixed value that the program never changes - the same convention as Java constants
+
+## Exercise 2-5: Look at the JavaScript
+
+In Java you can look inside a `.class` file to see what `javac` made. Here, just open `dist/app.js`:
+
+```js
+(() => {
+  // src/main.ts
+  var output = document.querySelector("#output");
+  if (output !== null) {
+    output.textContent = "Hello, World!";
+  }
+})();
+```
+
+Almost the same as `main.ts`:
+- the bundler wrapped it in `(() => { ... })();` to keep its variables private
+- and wrote `var` instead of `const` (an older keyword that every browser understands)
+
+As the projects grow, it is worth looking again: you will see the types disappear, and several files joined into one.
